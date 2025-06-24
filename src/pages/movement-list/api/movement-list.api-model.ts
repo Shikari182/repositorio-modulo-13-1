@@ -7,3 +7,9 @@ export interface Movement {
     realTransaction: string;
     accountId: string;
 }
+
+export interface Account {
+    iban: string;
+    name: string;
+    balance: number;
+}

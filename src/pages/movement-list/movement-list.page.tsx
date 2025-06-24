@@ -1,17 +1,20 @@
 import React from "react";
-import { MovementVm } from "./movement-list.vm";
+import { MovementVm, Account } from "./movement-list.vm";
 import { AppLayout } from "@/layouts";
 import classes from "./movement-list.page.module.css";
 import { MovementListTableComponent } from "./components";
-import { getMovementList } from "./api";
-import { mapMovementListFromApiToVm } from "./movement-list.mapper";
+import { getMovementList, getAccountById } from "./api";
+import { mapMovementListFromApiToVm, mapAccountFromApiToVm } from "./movement-list.mapper";
 import { useParams } from "react-router-dom";
-import { getAccountList } from "../account-list/api/account-list.api";
-import { Account } from "../account-list/api/account-list.api-model";
+
 
 export const MovementListPage: React.FC = () => {
   const [movementList, setMovementList] = React.useState<MovementVm[]>([]);
-  const [account, setAccount] = React.useState<Account | null>(null);
+  const [account, setAccount] = React.useState<Account>({
+    balance: 0,
+    iban: '',
+    name: '',
+  });
 
   const { id } = useParams<{ id: string }>();
 
@@ -22,13 +25,12 @@ export const MovementListPage: React.FC = () => {
       setMovementList(mapMovementListFromApiToVm(result));
     });
 
-    getAccountList().then((accounts) => {
-      const acct = accounts.find((a) => a.id === id);
-      if (acct) {
-        setAccount(acct);
-      }
-    });
-  }, [id]);
+    getAccountById(id).then((result) => {
+      const account = mapAccountFromApiToVm(result);
+      setAccount(account);
+    })
+
+}, []);
 
   return (
     <AppLayout>
